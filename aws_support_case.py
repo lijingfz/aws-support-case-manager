@@ -87,11 +87,15 @@ class AWSSupportCaseManager:
             raise ValueError("状态必须是'resolved'（关闭）或'reopened'（重新打开）")
         
         try:
-            response = self.support_client.resolve_case(
-                caseId=case_id,
-                status=status
-            ) if status.lower() == 'resolved' else self.support_client.reopen_case(
-                caseId=case_id
+            if status.lower() == 'resolved':
+                response = self.support_client.resolve_case(
+                    caseId=case_id
+                )
+            else:
+                # 使用add_communication_to_case方法重新打开案例
+                response = self.support_client.add_communication_to_case(
+                  caseId=case_id,
+                  communicationBody="重新打开案例"
             )
             
             logger.info(f"成功将案例 {case_id} 状态更新为 {status}")
